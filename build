@@ -1,0 +1,22 @@
+#!/usr/bin/php
+<?php
+// Require composer autoload
+require 'vendor/autoload.php';
+
+// Initialize the IoC Container and main components
+require 'app/bootstrap.php';
+
+$php = $app->make('php');
+
+// Unlink previous created project.phar
+if ($php->file_exists(__DIR__."/dployer.phar")) {
+    $php->unlink(__DIR__."/dployer.phar");
+}
+
+// Build dployer.phar
+echo "Building dployer.phar...\n";
+ini_set("phar.readonly", 0);
+$phar = new Phar("dployer.phar");
+$phar->setDefaultStub('main.php');
+$phar->buildFromDirectory(__DIR__);
+echo "Done\n";

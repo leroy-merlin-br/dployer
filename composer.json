@@ -1,0 +1,23 @@
+{
+    "name": "zizaco/dployer",
+    "require": {
+        "aws/aws-sdk-php": "~2.6.5",
+        "icecave/isolator": "~2.2.1",
+        "illuminate/container": "~4.2.0-BETA1",
+        "symfony/console": "~2.5"
+    },
+    "autoload": {
+        "classmap": [
+            "app"
+        ]
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Zizaco",
+            "email": "zizaco@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
