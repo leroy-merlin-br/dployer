@@ -1,4 +1,5 @@
-<?php namespace Dployer\Services;
+<?php
+namespace Dployer\Services;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -19,19 +20,20 @@ class ProjectPacker
     protected $output;
 
     /**
-     * Injects dependencies into the class
+     * Sets the output interface
      *
      * @param  $OutputInterface $output
      */
-    public function _construct(OutputInterface $output = null)
+    public function setOutput(OutputInterface $output = null)
     {
         $this->output = $output;
     }
 
     /**
-     * Packs the current repository + the vendor directory
+     * Packs the current repository + the vendor directory. Returns the filename
+     * or null if the file was not generated.
      *
-     * @return boolean Success
+     * @return string Filename
      */
     public function pack()
     {
@@ -50,17 +52,17 @@ class ProjectPacker
 
         // Create the zip the file
         $this->output->writeln("Creating zip file...");
-        $currentDir  = exec('$(pwd)');
-        $zipFilename = exec('ver_$(git log --format="%H" -n 1).zip');
-        exec('cd ../.deployment');
+        $currentDir  = getcwd();
+        $zipFilename = exec('echo ver_$(git log --format="%H" -n 1).zip');
+        chdir("../.deployment");
         exec('zip -r '.$zipFilename.' * > /dev/null');
         exec('mv '.$zipFilename.' "'.$currentDir.'/'.$zipFilename.'"');
-        exec('cd '.$currentDir);
+        chdir($currentDir);
 
         // Remove tmp folder
         $this->output->writeln("Removing temporary files...");
         exec('rm -rf ../.deployment');
 
-        $this->output->writeln("Done");
+        return $zipFilename;
     }
 }
