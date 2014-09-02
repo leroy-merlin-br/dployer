@@ -21,6 +21,11 @@ class Deploy extends Command
     {
         parent::__construct();
         $this->app = app();
+
+        file_put_contents(
+            sys_get_temp_dir() . '/guzzle-cacert.pem',
+            file_get_contents('vendor/guzzle/guzzle/src/Guzzle/Http/Resources/cacert.pem')
+        );
     }
 
     /**
