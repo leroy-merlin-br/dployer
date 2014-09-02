@@ -1,5 +1,13 @@
 {
     "name": "zizaco/dployer",
+    "description": "A simple script to deploy PHP applications to AWS ElasticBeanstalk",
+    "license": "MIT",
+    "keywords": [
+        "deploy",
+        "aws",
+        "elasticbeanstalk",
+        "ebs"
+    ],
     "require": {
         "aws/aws-sdk-php": "~2.6.5",
         "icecave/isolator": "~2.2.1",
@@ -11,13 +19,14 @@
             "app"
         ]
     },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Zizaco",
-            "email": "zizaco@gmail.com"
-        }
+    "bin": [
+        "dployer"
     ],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
