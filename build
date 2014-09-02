@@ -13,10 +13,29 @@ if ($php->file_exists(__DIR__."/dployer.phar")) {
     $php->unlink(__DIR__."/dployer.phar");
 }
 
+if ($php->file_exists(__DIR__."/dployer")) {
+    $php->unlink(__DIR__."/dployer");
+}
+
+// Recursive glob
+function glob_recursive($pattern, $flags = 0)
+{
+    $files = glob($pattern, $flags);
+    foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir)
+    {
+        $files = array_merge($files, glob_recursive($dir.'/'.basename($pattern), $flags));
+    }
+    return $files;
+}
+
 // Build dployer.phar
 echo "Building dployer.phar...\n";
 ini_set("phar.readonly", 0);
 $phar = new Phar("dployer.phar");
-$phar->setDefaultStub('main.php');
-$phar->buildFromDirectory(__DIR__);
+$phar->setStub("#!/usr/bin/env php\n".$phar->createDefaultStub('main.php'));
+foreach(glob_recursive('*.php',GLOB_BRACE) as $file) {
+    $phar->addFile($file);
+}
+exec("chmod +x dployer.phar");
+exec("mv dployer.phar dployer");
 echo "Done\n";
