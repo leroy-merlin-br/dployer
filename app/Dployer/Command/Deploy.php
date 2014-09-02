@@ -1,11 +1,27 @@
-<?php namespace Dployer\Command;
+<?php
+namespace Dployer\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Deploy extends Command {
+class Deploy extends Command
+{
+    /**
+     * Application
+     * @var Illuminate\Container\Container
+     */
+    protected $app;
+
+    /**
+     * Set the app attribute using the global $app variable
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->app = app();
+    }
 
     /**
      * Configures the current command.
@@ -22,9 +38,9 @@ class Deploy extends Command {
                 'Name of the application within Elastic Beanstalk'
             )
             ->addArgument(
-               'environment',
-               InputArgument::REQUIRED,
-               'Environment name within the Application'
+                'environment',
+                InputArgument::REQUIRED,
+                'Environment name within the Application'
             )
         ;
     }
@@ -34,13 +50,35 @@ class Deploy extends Command {
      *
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
+     *
      * @return null|int     null or 0 if everything went fine, or an error code
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $text  = "APP:".$input->getArgument('app');
-        $text .= "\nENV:".$input->getArgument('environment');
+        $app       = $input->getArgument('app');
+        $env       = $input->getArgument('environment');
+        $branch    = exec('echo $(git branch | sed -n -e \'s/^\* \(.*\)/\1/p\')');
+        $commitMsg = exec('echo $(git log --format="%s" -n 1)');
 
-        $output->writeln($text);
+        $output->writeln("<info>APP:</info>".$app);
+        $output->writeln("<info>ENV:</info>".$env);
+
+        $packer = $this->app->make('Dployer\Services\ProjectPacker');
+        $packer->setOutput($output);
+        $filename = $packer->pack();
+
+        $ebsManager = $this->app->make('Dployer\Services\EBSVersionManager');
+        $ebsManager->init($app, $env, $output);
+        $versionLabel = $ebsManager->createVersion($filename, "[$branch] $commitMsg");
+
+        if ($versionLabel) {
+            if ($ebsManager->deployVersion($versionLabel)) {
+                $output->writeln("<info>done</info>");
+                return 0;
+            }
+        }
+
+        $output->writeln("<error>failed</error>");
+        return 1;
     }
 }
