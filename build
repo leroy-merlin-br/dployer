@@ -34,6 +34,9 @@ ini_set("phar.readonly", 0);
 $phar = new Phar("dployer.phar");
 $phar->setStub("#!/usr/bin/env php\n".$phar->createDefaultStub('main.php'));
 foreach(glob_recursive('*.php',GLOB_BRACE) as $file) {
+    if (substr($file, 0, 2) == './') {
+        $file = substr($file, 2);
+    }
     $phar->addFile($file);
 }
 exec("chmod +x dployer.phar");
