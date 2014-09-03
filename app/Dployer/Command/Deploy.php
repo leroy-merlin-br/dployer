@@ -78,6 +78,7 @@ class Deploy extends Command
 
         if ($versionLabel && $ebsManager->deployVersion($versionLabel)) {
             $fileRemoved = $this->removeZipFile($filename);
+            $output->writeln("<info>Removing $filename</info>");
             if (false === $fileRemoved) {
                 $output->writeln("<info>Unable to remove zip file. Run manually:</info>");
                 $output->writeln("<info>rm $filename</info>");
