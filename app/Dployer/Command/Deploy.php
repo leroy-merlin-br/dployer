@@ -77,7 +77,7 @@ class Deploy extends Command
         $versionLabel = $ebsManager->createVersion($filename, "[$branch] $commitMsg");
 
         if ($versionLabel && $ebsManager->deployVersion($versionLabel)) {
-            $this->removeZipFile($filename);
+            $this->removeZipFile($filename, $output);
             $output->writeln("<info>done</info>");
 
             return 0;
@@ -92,8 +92,9 @@ class Deploy extends Command
      * Removes the deployed .zip file
      *
      * @param string $filename
+     * @param OutputInterface $output An OutputInterface instance
      */
-    protected function removeZipFile($filename)
+    protected function removeZipFile($filename, OutputInterface $output)
     {
         $output->writeln("Removing $filename...");
         if (false === unlink($filename)) {
