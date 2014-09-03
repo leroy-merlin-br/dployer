@@ -76,14 +76,32 @@ class Deploy extends Command
         $ebsManager->init($app, $env, $output);
         $versionLabel = $ebsManager->createVersion($filename, "[$branch] $commitMsg");
 
-        if ($versionLabel) {
-            if ($ebsManager->deployVersion($versionLabel)) {
-                $output->writeln("<info>done</info>");
-                return 0;
+        if ($versionLabel && $ebsManager->deployVersion($versionLabel)) {
+            $fileRemoved = $this->removeZipFile($filename);
+            if (false === $fileRemoved) {
+                $output->writeln("<info>Unable to remove zip file. Run manually:</info>");
+                $output->writeln("<info>rm $filename</info>");
             }
+
+            $output->writeln("<info>done</info>");
+
+            return 0;
         }
 
         $output->writeln("<error>failed</error>");
+
         return 1;
+    }
+
+    /**
+     * Removes the deployed .zip file
+     *
+     * @param string $filename
+     *
+     * @return boolean
+     */
+    protected function removeZipFile($filename)
+    {
+        return unlink($filename);
     }
 }
