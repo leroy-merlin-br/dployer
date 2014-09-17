@@ -3,7 +3,7 @@
 
 A simple script to deploy PHP applications in a few minutes to ElasticBeanstalk.
 
-## Instalattion
+## Installation
 
 ### Composer
 
