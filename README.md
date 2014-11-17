@@ -35,9 +35,9 @@ $ composer global require "leroy-merlin-br/dployer=*@dev"
 
 ### AWS Bucket
 
-Add the folowwing line in the end of the `~/.bashrc` file:
+Add the following line in the end of the `~/.bashrc` file:
 ``` shell
-export DPLOYER_BUCKET=you-bucket-identifier-0-12345678
+export DPLOYER_BUCKET=your-bucket-identifier-0-12345678
 ```
 
 ## Usage
