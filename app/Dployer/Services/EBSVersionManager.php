@@ -186,7 +186,7 @@ class EBSVersionManager
      *
      * @return boolean
      */
-    protected function allEnvVariablesAvaliable()
+    protected function allEnvironmentVariablesOk()
     {
         foreach (static::$envVarsRequired as $envVar) {
             if (! getenv($envVar)) {
