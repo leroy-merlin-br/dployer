@@ -1,5 +1,9 @@
 #!/usr/bin/php
 <?php
+if ((boolean)ini_get('phar.readonly')) {
+    die("Failed!\n\nThe 'phar.readonly' property on php.ini must be set to 'Off'");
+}
+
 // Require composer autoload
 require 'vendor/autoload.php';
 
@@ -30,7 +34,6 @@ function glob_recursive($pattern, $flags = 0)
 
 // Build dployer.phar
 echo "Building dployer.phar...\n";
-ini_set("phar.readonly", 0);
 $phar = new Phar("dployer.phar");
 $phar->setStub("#!/usr/bin/env php\n".$phar->createDefaultStub('main.php'));
 foreach(glob_recursive('*.{php,pem,json,xml}',GLOB_BRACE) as $file) {
