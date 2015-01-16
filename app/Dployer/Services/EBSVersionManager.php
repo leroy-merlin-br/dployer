@@ -36,6 +36,17 @@ class EBSVersionManager
     protected $aws;
 
     /**
+     * All env vars required to deploy something.
+     * @var [type]
+     */
+    protected static $envVarsRequired = [
+        'DPLOYER_PROFILE',
+        'DPLOYER_REGION',
+        'DPLOYER_AWS_KEY',
+        'DPLOYER_AWS_SECRET'
+    ];
+
+    /**
      * Set the app attribute using the global $app variable
      */
     public function __construct()
@@ -43,7 +54,10 @@ class EBSVersionManager
         $this->app = app();
 
         $aws = $this->app->make('Aws\Common\Aws');
-        $this->aws = $aws->factory(getenv("HOME").'/.aws/config.json');
+
+        $config = $this->buildConfig();
+
+        $this->aws = $aws->factory($config);
     }
 
     /**
@@ -119,7 +133,11 @@ class EBSVersionManager
     {
         $ebs = $this->aws->get('ElasticBeanstalk');
 
-        $this->output->writeln("Deploying version <info>$versionLabel</info> to <info>".$this->app." ".$this->env."</info>...");
+        $this->output->writeln(
+            "Deploying version <info>$versionLabel</info> to <info>".
+            $this->app." ".$this->env."</info>..."
+        );
+
         $env = $ebs->updateEnvironment([
             "ApplicationName" => $this->app,
             "EnvironmentName" => $this->env,
@@ -131,5 +149,51 @@ class EBSVersionManager
         }
 
         return false;
+    }
+
+    /**
+     * Builds the aws configuration.
+     *
+     * @return array
+     */
+    protected function buildConfig()
+    {
+        if ($this->allEnvironmentVariablesOk()) {
+            $defaultConfig = [
+                "includes" => ["_aws"],
+                "services" => [
+                    "default_settings" => [
+                        "params" => [
+                            "profile" => getenv('DPLOYER_PROFILE'),
+                            "region"  => getenv('DPLOYER_REGION'),
+                            "key"     => getenv('DPLOYER_AWS_KEY'),
+                            "secret"  => getenv('DPLOYER_AWS_SECRET')
+                        ]
+                    ]
+                ]
+            ];
+
+            return $defaultConfig;
+        }
+
+        $fileConfig = getenv("HOME").'/.aws/config.json';
+
+        return $fileConfig;
+    }
+
+    /**
+     * Verifies if all env vars are avaliable to fill the configuration.
+     *
+     * @return boolean
+     */
+    protected function allEnvVariablesAvaliable()
+    {
+        foreach (static::$envVarsRequired as $envVar) {
+            if (! getenv($envVar)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -15,6 +15,22 @@ $ composer global require "leroy-merlin-br/dployer=*@dev"
 
 ### AWS config
 
+You have 2 options:
+
+- Environment variables
+- Configuration file
+
+#### Environment variables
+
+You must fill the following environment variables.
+
+- `DPLOYER_PROFILE` : Your profile's name in AWS.
+- `DPLOYER_REGION`  : Your region you want to deploy something.
+- `DPLOYER_AWS_KEY` : Your secret AWS key.
+- `DPLOYER_AWS_SECRET` : Your secret AWS SECRET.
+
+#### Configuration file
+
 - Create the following configuration file: `~/.aws/config.json`
 
 ```json
