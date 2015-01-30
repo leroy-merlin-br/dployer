@@ -160,17 +160,9 @@ class EBSVersionManager
     {
         if ($this->allEnvironmentVariablesOk()) {
             $defaultConfig = [
-                "includes" => ["_aws"],
-                "services" => [
-                    "default_settings" => [
-                        "params" => [
-                            "profile" => getenv('DPLOYER_PROFILE'),
-                            "region"  => getenv('DPLOYER_REGION'),
-                            "key"     => getenv('DPLOYER_AWS_KEY'),
-                            "secret"  => getenv('DPLOYER_AWS_SECRET')
-                        ]
-                    ]
-                ]
+                "region"  => getenv('DPLOYER_REGION'),
+                "key"     => getenv('DPLOYER_AWS_KEY'),
+                "secret"  => getenv('DPLOYER_AWS_SECRET')
             ];
 
             return $defaultConfig;
