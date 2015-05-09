@@ -35,17 +35,24 @@ class Config
     /**
      * Retrieves the value of corresponding key.
      *
-     * @param  string $key
+     * @param  string $path
      *
      * @return string|integer|array|null
      */
-    public function get($key)
+    public function get($path)
     {
-        if (false === array_key_exists($key, $this->data)) {
-            return null;
-        }
+        $value = $this->data;
+        $path = strtok($path, '.');
 
-        return $this->data[$key];
+        do {
+            if (false === array_key_exists($path, $value)) {
+                return null;
+            }
+
+            $value = $value[$path];
+        } while ($path = strtok('.'));
+
+        return $value;
     }
 
     /**

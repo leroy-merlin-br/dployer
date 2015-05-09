@@ -21,6 +21,19 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             [
                 'app' => 'app-value',
                 'env' => 'env-value',
+                "second" => [
+                    "level" => "second-value",
+                ],
+                "third" => [
+                    "level" => [
+                        "key" => "third-value",
+                        "array" => [
+                            "third-value-array-1",
+                            "third-value-array-2",
+                            "third-value-array-3",
+                        ]
+                    ]
+                ]
             ],
             'data',
             $config
@@ -48,6 +61,31 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $config = new Config($this->getFixture('well-formatted.json'));
 
         $this->assertNull($config->get('non-existent-key'));
+    }
+
+    public function testGetSecondLevelValueUsingDotNotationShouldReturnValue()
+    {
+        $config = new Config($this->getFixture('well-formatted.json'));
+
+        $this->assertEquals('second-value', $config->get('second.level'));
+    }
+
+    public function testGetThirdLevelValueUsingDotNotationShouldReturnValue()
+    {
+        $config = new Config($this->getFixture('well-formatted.json'));
+
+        $this->assertEquals(
+            'third-value',
+            $config->get('third.level.key')
+        );
+        $this->assertEquals(
+            [
+                'third-value-array-1',
+                'third-value-array-2',
+                'third-value-array-3',
+            ],
+            $config->get('third.level.array')
+        );
     }
 
     /**
