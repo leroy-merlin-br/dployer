@@ -12,7 +12,8 @@
         "aws/aws-sdk-php": "~2.6.5",
         "icecave/isolator": "~2.2.1",
         "illuminate/container": "~4.2.0-BETA1",
-        "symfony/console": "~2.5"
+        "symfony/console": "~2.5",
+        "phpunit/phpunit": "~4.6"
     },
     "autoload": {
         "classmap": [
