@@ -11,8 +11,7 @@ class BadFormattedFileExceptionTest extends \PHPUnit_Framework_TestCase
     public function testConstructorShouldCallParentWithCustomMessage()
     {
         $filePath  = 'some';
-        $previous  = new LogicException();
-        $exception = new BadFormattedFileException($filePath, $previous);
+        $exception = new BadFormattedFileException($filePath);
 
         $this->assertEquals(
             'Error trying to parse some file',
