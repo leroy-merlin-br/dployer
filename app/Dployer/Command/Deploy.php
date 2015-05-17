@@ -48,13 +48,13 @@ class Deploy extends Command
             ->setDescription('Deploys the current application on elastic beanstalk')
             ->setHelp('Deploys the current application on elastic beanstalk. You must provide the application name and the environment where the deploy is going to be made.')
             ->addArgument(
-                'app',
-                InputArgument::REQUIRED,
+                'application',
+                InputArgument::OPTIONAL,
                 'Name of the application within Elastic Beanstalk'
             )
             ->addArgument(
                 'environment',
-                InputArgument::REQUIRED,
+                InputArgument::OPTIONAL,
                 'Environment name within the Application'
             )
         ;
@@ -70,8 +70,19 @@ class Deploy extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $app       = $input->getArgument('app');
-        $env       = $input->getArgument('environment');
+        $app = $input->getArgument('application')
+            ?: $this->getConfigValue('application');
+        $env = $input->getArgument('environment')
+            ?: $this->getConfigValue('environment');
+
+        if (! $app) {
+            return $this->variableNotDefined('application', $output);
+        }
+
+        if (! $env) {
+            return $this->variableNotDefined('environment', $output);
+        }
+
         $branch    = exec('echo $(git branch | sed -n -e \'s/^\* \(.*\)/\1/p\')');
         $commitMsg = exec('echo $(git log --format="%s" -n 1)');
 
@@ -129,5 +140,25 @@ class Deploy extends Command
         }
 
         return $this->config->get($key);
+    }
+
+    /**
+     * Abort application due to missing required variable
+     *
+     * @param string $var
+     * @param OutputInterface $output
+     *
+     * @return 0
+     */
+    protected function variableNotDefined($var, OutputInterface $output)
+    {
+        $output->writeln(sprintf("<error>%s is not defined</error>", $var));
+        $output->writeln(sprintf(
+            "Add '%s' key in the .dployer file or pass it as ".
+            "command parameter",
+            $var
+        ));
+
+        return 0;
     }
 }
