@@ -91,7 +91,9 @@ class Deploy extends Command
 
         $packer = $this->app->make('Dployer\Services\ProjectPacker');
         $packer->setOutput($output);
-        $filename = $packer->pack();
+        $filename = $packer->pack(
+            (array)$this->getConfigValue('exclude-paths')
+        );
 
         $ebsManager = $this->app->make('Dployer\Services\EBSVersionManager');
         $ebsManager->init($app, $env, $output);
