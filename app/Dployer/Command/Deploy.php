@@ -1,6 +1,8 @@
 <?php
 namespace Dployer\Command;
 
+use Dployer\Config\BadFormattedFileException;
+use Dployer\Config\Config;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,6 +24,14 @@ class Deploy extends Command
         parent::__construct();
         $this->app = app();
 
+        try {
+            $this->config = new Config(getcwd().'/.dployer');
+        } catch (\InvalidArgumentException $error) {
+            $this->config = null;
+        } catch (BadFormattedFileException $error) {
+            die($error->getMessage());
+        }
+
         file_put_contents(
             sys_get_temp_dir() . '/guzzle-cacert.pem',
             file_get_contents('vendor/guzzle/guzzle/src/Guzzle/Http/Resources/cacert.pem')
@@ -38,13 +48,13 @@ class Deploy extends Command
             ->setDescription('Deploys the current application on elastic beanstalk')
             ->setHelp('Deploys the current application on elastic beanstalk. You must provide the application name and the environment where the deploy is going to be made.')
             ->addArgument(
-                'app',
-                InputArgument::REQUIRED,
+                'application',
+                InputArgument::OPTIONAL,
                 'Name of the application within Elastic Beanstalk'
             )
             ->addArgument(
                 'environment',
-                InputArgument::REQUIRED,
+                InputArgument::OPTIONAL,
                 'Environment name within the Application'
             )
         ;
@@ -60,8 +70,19 @@ class Deploy extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $app       = $input->getArgument('app');
-        $env       = $input->getArgument('environment');
+        $app = $input->getArgument('application')
+            ?: $this->getConfigValue('application');
+        $env = $input->getArgument('environment')
+            ?: $this->getConfigValue('environment');
+
+        if (! $app) {
+            return $this->variableNotDefined('application', $output);
+        }
+
+        if (! $env) {
+            return $this->variableNotDefined('environment', $output);
+        }
+
         $branch    = exec('echo $(git branch | sed -n -e \'s/^\* \(.*\)/\1/p\')');
         $commitMsg = exec('echo $(git log --format="%s" -n 1)');
 
@@ -103,5 +124,41 @@ class Deploy extends Command
         } else {
             $output->writeln("Removed");
         }
+    }
+
+    /**
+     * Retrieves value from config file
+     *
+     * @param string $key
+     *
+     * @return array|integer|string|null
+     */
+    protected function getConfigValue($key)
+    {
+        if (! $this->config) {
+            return null;
+        }
+
+        return $this->config->get($key);
+    }
+
+    /**
+     * Abort application due to missing required variable
+     *
+     * @param string $var
+     * @param OutputInterface $output
+     *
+     * @return 0
+     */
+    protected function variableNotDefined($var, OutputInterface $output)
+    {
+        $output->writeln(sprintf("<error>%s is not defined</error>", $var));
+        $output->writeln(sprintf(
+            "Add '%s' key in the .dployer file or pass it as ".
+            "command parameter",
+            $var
+        ));
+
+        return 0;
     }
 }

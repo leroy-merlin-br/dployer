@@ -1,0 +1,17 @@
+{
+    "app": "app-value",
+    "env": "env-value",
+    "second": {
+        "level": "second-value"
+    },
+    "third": {
+        "level": {
+            "key": "third-value",
+            "array": [
+                "third-value-array-1",
+                "third-value-array-2",
+                "third-value-array-3"
+            ]
+        }
+    }
+}
