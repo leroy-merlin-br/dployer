@@ -1,6 +1,8 @@
 <?php
 namespace Dployer\Command;
 
+use Dployer\Config\BadFormattedFileException;
+use Dployer\Config\Config;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,6 +23,14 @@ class Deploy extends Command
     {
         parent::__construct();
         $this->app = app();
+
+        try {
+            $this->config = new Config(getcwd().'/.dployer');
+        } catch (\InvalidArgumentException $error) {
+            $this->config = null;
+        } catch (BadFormattedFileException $error) {
+            die($error->getMessage());
+        }
 
         file_put_contents(
             sys_get_temp_dir() . '/guzzle-cacert.pem',
@@ -103,5 +113,21 @@ class Deploy extends Command
         } else {
             $output->writeln("Removed");
         }
+    }
+
+    /**
+     * Retrieves value from config file
+     *
+     * @param string $key
+     *
+     * @return array|integer|string|null
+     */
+    protected function getConfigValue($key)
+    {
+        if (! $this->config) {
+            return null;
+        }
+
+        return $this->config->get($key);
     }
 }
