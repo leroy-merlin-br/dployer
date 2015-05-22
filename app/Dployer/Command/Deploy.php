@@ -3,6 +3,7 @@ namespace Dployer\Command;
 
 use Dployer\Config\BadFormattedFileException;
 use Dployer\Config\Config;
+use Dployer\Event\ScriptRunner;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,6 +16,16 @@ class Deploy extends Command
      * @var Illuminate\Container\Container
      */
     protected $app;
+
+    /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
+     * @var ScriptRunner
+     */
+    protected $scriptRunner;
 
     /**
      * Set the app attribute using the global $app variable
@@ -31,6 +42,8 @@ class Deploy extends Command
         } catch (BadFormattedFileException $error) {
             die($error->getMessage());
         }
+
+        $this->scriptRunner = new ScriptRunner();
 
         file_put_contents(
             sys_get_temp_dir() . '/guzzle-cacert.pem',
@@ -83,17 +96,23 @@ class Deploy extends Command
             return $this->variableNotDefined('environment', $output);
         }
 
+        $this->dispatchEvent('init', $output);
+
         $branch    = exec('echo $(git branch | sed -n -e \'s/^\* \(.*\)/\1/p\')');
         $commitMsg = exec('echo $(git log --format="%s" -n 1)');
 
         $output->writeln("<info>APP:</info>".$app);
         $output->writeln("<info>ENV:</info>".$env);
 
+        $this->dispatchEvent('before-pack', $output);
+
         $packer = $this->app->make('Dployer\Services\ProjectPacker');
         $packer->setOutput($output);
         $filename = $packer->pack(
             (array)$this->getConfigValue('exclude-paths')
         );
+
+        $this->dispatchEvent('before-deploy', $output);
 
         $ebsManager = $this->app->make('Dployer\Services\EBSVersionManager');
         $ebsManager->init($app, $env, $output);
@@ -103,8 +122,12 @@ class Deploy extends Command
             $this->removeZipFile($filename, $output);
             $output->writeln("<info>done</info>");
 
+            $this->dispatchEvent('finish', $output);
+
             return 0;
         }
+
+        $this->dispatchEvent('finish', $output);
 
         $output->writeln("<error>failed</error>");
 
@@ -162,5 +185,25 @@ class Deploy extends Command
         ));
 
         return 0;
+    }
+
+    /**
+     * Dispatch an event and execute the commands in 'script' key on config
+     * file
+     *
+     * @param string $eventName
+     * @param OutputInterface $output
+     */
+    protected function dispatchEvent($eventName, OutputInterface $output)
+    {
+        $scripts = $this->getConfigValue('scripts.'.$eventName);
+
+        if (is_null($scripts)) {
+            return;
+        }
+
+        $output->writeln('Event: '.$eventName);
+
+        $this->scriptRunner->run((array)$scripts, $output);
     }
 }
