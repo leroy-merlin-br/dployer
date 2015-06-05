@@ -34,19 +34,19 @@ class ProjectPacker
      * or null if the file was not generated.
      *
      * @param array $excludePaths Paths to exclude before pack zip file
+     * @param array $copyPaths Paths to copy from project before create zip file
      *
      * @return string Filename
      */
-    public function pack(array $excludePaths = [])
+    public function pack(array $excludePaths = [], array $copyPaths = [])
     {
         // Clone the repo into a tmp folder
         $this->output->writeln("Clonning clean repository...");
         exec('git clone . ../.deployment > /dev/null');
 
-        // Copy current composer dependencies
-        $this->output->writeln("Copying vendor directory...");
-        exec('cp -rf vendor ../.deployment/vendor');
-        exec('cp -rf composer.lock ../.deployment/composer.lock');
+        if (false === empty($copyPaths)) {
+            $this->copyPaths($copyPaths);
+        }
 
         // Create the zip the file
         $currentDir  = getcwd();
@@ -54,13 +54,7 @@ class ProjectPacker
         chdir("../.deployment");
 
         if (false === empty($excludePaths)) {
-            $this->output->writeln(
-                "Removing files in 'exclude-paths' key in config file:"
-            );
-            foreach ($excludePaths as $path) {
-                $this->output->writeln("* ".$path);
-                exec('rm -rf '.$path);
-            }
+            $this->removePaths($excludePaths);
         }
 
         $this->output->writeln("Creating zip file...");
@@ -73,5 +67,39 @@ class ProjectPacker
         exec('rm -rf ../.deployment');
 
         return $zipFilename;
+    }
+
+    /**
+     * Remvove the given paths
+     *
+     * @param  array  $paths
+     */
+    public function removePaths(array $paths)
+    {
+        $this->output->writeln(
+            "Removing files in the 'exclude-paths' key from config file:"
+        );
+
+        foreach ($paths as $path) {
+            $this->output->writeln(" * ".$path);
+            exec('rm -rf '.$path);
+        }
+    }
+
+    /**
+     * Copy the given paths to .deployment folder
+     *
+     * @param  array  $paths
+     */
+    public function copyPaths(array $paths)
+    {
+        $this->output->writeln(
+            "Copying files in the 'copy-paths' key from config file:"
+        );
+
+        foreach ($paths as $path) {
+            $this->output->writeln(" * ".$path);
+            exec(sprintf('cp -rf --parents %s ../.deployment', $path));
+        }
     }
 }
