@@ -39,10 +39,6 @@ class ProjectPacker
      */
     public function pack(array $excludePaths = [])
     {
-        // Dumping autoload
-        $this->output->writeln("Dumping autoload...");
-        exec('composer dump-autoload');
-
         // Clone the repo into a tmp folder
         $this->output->writeln("Clonning clean repository...");
         exec('git clone . ../.deployment > /dev/null');
