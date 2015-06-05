@@ -7,6 +7,7 @@ use Dployer\Event\ScriptRunner;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Deploy extends Command
@@ -70,6 +71,12 @@ class Deploy extends Command
                 InputArgument::OPTIONAL,
                 'Environment name within the Application'
             )
+            ->addOption(
+                'interactive',
+                'i',
+                InputOption::VALUE_NONE,
+                'Asks before run every script in .dployer file'
+            )
         ;
     }
 
@@ -94,6 +101,14 @@ class Deploy extends Command
 
         if (! $env) {
             return $this->variableNotDefined('environment', $output);
+        }
+
+        if ($input->hasOption('interactive')) {
+            $input->setInteractive(true);
+            $this->scriptRunner->enableInteractivity(
+                $input,
+                $this->getHelper('question')
+            );
         }
 
         $this->dispatchEvent('init', $output);
