@@ -124,7 +124,8 @@ class Deploy extends Command
         $packer = $this->app->make('Dployer\Services\ProjectPacker');
         $packer->setOutput($output);
         $filename = $packer->pack(
-            (array)$this->getConfigValue('exclude-paths')
+            (array)$this->getConfigValue('exclude-paths'),
+            (array)$this->getConfigValue('copy-paths')
         );
 
         $this->dispatchEvent('before-deploy', $output);
