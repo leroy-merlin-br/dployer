@@ -33,14 +33,12 @@ class ProjectPacker
      * Packs the current repository + the vendor directory. Returns the filename
      * or null if the file was not generated.
      *
+     * @param array $excludePaths Paths to exclude before pack zip file
+     *
      * @return string Filename
      */
-    public function pack()
+    public function pack(array $excludePaths = [])
     {
-        // Dumping autoload
-        $this->output->writeln("Dumping autoload...");
-        exec('composer dump-autoload');
-
         // Clone the repo into a tmp folder
         $this->output->writeln("Clonning clean repository...");
         exec('git clone . ../.deployment > /dev/null');
@@ -51,10 +49,21 @@ class ProjectPacker
         exec('cp -rf composer.lock ../.deployment/composer.lock');
 
         // Create the zip the file
-        $this->output->writeln("Creating zip file...");
         $currentDir  = getcwd();
         $zipFilename = exec('echo ver_$(git log --format="%H" -n 1).zip');
         chdir("../.deployment");
+
+        if (false === empty($excludePaths)) {
+            $this->output->writeln(
+                "Removing files in 'exclude-paths' key in config file:"
+            );
+            foreach ($excludePaths as $path) {
+                $this->output->writeln("* ".$path);
+                exec('rm -rf '.$path);
+            }
+        }
+
+        $this->output->writeln("Creating zip file...");
         exec('zip -r '.$zipFilename.' * > /dev/null');
         exec('mv '.$zipFilename.' "'.$currentDir.'/'.$zipFilename.'"');
         chdir($currentDir);
