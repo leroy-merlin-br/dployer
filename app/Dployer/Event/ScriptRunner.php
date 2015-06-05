@@ -18,12 +18,29 @@ class ScriptRunner
     {
         foreach ($scripts as $script) {
             $output->write(sprintf(' * %s: ', $script));
-            $response = exec($script, $execOutput, $error);
+            exec($script, $response, $error);
             $output->writeln(
                 ($error)
                 ? '<error>Error!</error>'
                 : '<info>Success!</info>'
             );
+
+            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                $this->writeResponse($response, $output);
+            }
+        }
+    }
+
+    /**
+     * Write all lines of script response
+     *
+     * @param  array           $response
+     * @param  OutputInterface $output
+     */
+    private function writeResponse(array $response, OutputInterface $output)
+    {
+        foreach ($response as $line) {
+            $output->writeln('    '.$line);
         }
     }
 }
