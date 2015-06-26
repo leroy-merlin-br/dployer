@@ -99,7 +99,11 @@ class ProjectPacker
 
         foreach ($paths as $path) {
             $this->output->writeln(" * ".$path);
-            exec(sprintf('cp -rf --parents %s ../.deployment', $path));
+            if (PHP_OS == 'Linux') {
+                exec(sprintf('cp -rf --parents %s ../.deployment', $path));
+            } else {
+                exec(sprintf('cp -rf %1$s ../.deployment/%1$s', $path));
+            }
         }
     }
 }
