@@ -59,4 +59,4 @@ export DPLOYER_BUCKET=your-bucket-identifier-0-12345678
 ## Usage
 Inside the folder that you want to deploy, just run:
 ```shell
-$ dployer deploy ApplicationName elasticbeanstalked-environment
+dployer deploy ApplicationName elasticbeanstalked-environment
