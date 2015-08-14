@@ -8,7 +8,7 @@ A simple script to deploy PHP applications in a few minutes to ElasticBeanstalk.
 ### Composer
 
 ```shell
-$ composer global require "leroy-merlin-br/dployer=*@dev"
+composer global require "leroy-merlin-br/dployer=*@dev"
 ```
 
 ## Configuration
