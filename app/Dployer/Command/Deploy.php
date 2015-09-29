@@ -103,8 +103,7 @@ class Deploy extends Command
             return $this->variableNotDefined('environment', $output);
         }
 
-        if ($input->hasOption('interactive')) {
-            $input->setInteractive(true);
+        if ($input->getOption('interactive')) {
             $this->scriptRunner->enableInteractivity(
                 $input,
                 $this->getHelper('question')

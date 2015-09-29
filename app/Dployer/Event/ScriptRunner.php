@@ -52,6 +52,8 @@ class ScriptRunner
         InputInterface $input,
         QuestionHelper $helper
     ) {
+        $input->setInteractive(true);
+
         $this->interactive = true;
         $this->input  = $input;
         $this->helper = $helper;
