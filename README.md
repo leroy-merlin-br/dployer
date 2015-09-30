@@ -89,12 +89,13 @@ You can use the following options:
 
 - **-i (--interactive)**: Asks before run each command in configuration file
 - **-v (--verbose)**: Display command outputs
+- **-f (--force)**: Continue with deploy process even if a script exits with error
 
 ## Project configuration
 
 In order to optimize the deploy of your project, you can create a configuration
 file to keep application and environment variables. In addition, you gain some
-extra features, like: events to run the scripts that you want and options to 
+extra features, like: events to run the scripts that you want and options to
 copy extra files and delete some files before zip them.
 
 Just create a `.dployer` file in project root dir.
@@ -151,7 +152,7 @@ The dployer just clone your current git branch inside a temp folder, then it
 creates a zip file. But sometimes, you want to deploy some files which are
 ignored by git (inside `.gitignore` file).
 
-In this case, you can put these files/folders in `copy-paths` key in 
+In this case, you can put these files/folders in `copy-paths` key in
 configuration file as demonstrated in sample section.
 
 `.dployer`
