@@ -27,6 +27,11 @@ class ScriptRunner
     protected $helper;
 
     /**
+     * @var boolean
+     */
+    protected $stopOnError = true;
+
+    /**
      * Run script set
      *
      * @param array $scripts
@@ -57,6 +62,18 @@ class ScriptRunner
         $this->interactive = true;
         $this->input  = $input;
         $this->helper = $helper;
+
+        return $this;
+    }
+
+    /**
+     * Continue running scripts even if it returns with errors
+     *
+     * @return self
+     */
+    public function continueOnError()
+    {
+        $this->stopOnError = false;
 
         return $this;
     }
@@ -105,6 +122,22 @@ class ScriptRunner
         if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
             $this->writeResponse($response, $output);
         }
+
+        $question = new ConfirmationQuestion(
+            'An error ocurred. Do you want to continue with deploy (y/N)?',
+            false
+        );
+
+        $isForce      = ($this->stopOnError && false === $this->interactive);
+        $confirmAbort = ($this->interactive &&
+            false === $this->helper->ask($this->input, $output, $question)
+        );
+
+        if ($error && ($isForce || $confirmAbort)) {
+            throw new ScriptErrorException();
+        }
+
+        return true;
     }
 
     /**

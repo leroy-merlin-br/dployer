@@ -4,6 +4,7 @@ namespace Dployer\Command;
 use Dployer\Config\BadFormattedFileException;
 use Dployer\Config\Config;
 use Dployer\Event\ScriptRunner;
+use Dployer\Event\ScriptErrorException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -77,6 +78,12 @@ class Deploy extends Command
                 InputOption::VALUE_NONE,
                 'Asks before run every script in .dployer file'
             )
+            ->addOption(
+                'force',
+                'f',
+                InputOption::VALUE_NONE,
+                'Continue deploy process even if it throws an error'
+            )
         ;
     }
 
@@ -108,6 +115,10 @@ class Deploy extends Command
                 $input,
                 $this->getHelper('question')
             );
+        }
+
+        if ($input->getOption('force')) {
+            $this->scriptRunner->continueOnError();
         }
 
         $this->dispatchEvent('init', $output);
@@ -219,6 +230,10 @@ class Deploy extends Command
 
         $output->writeln('Event: '.$eventName);
 
-        $this->scriptRunner->run((array)$scripts, $output);
+        try {
+            $this->scriptRunner->run((array)$scripts, $output);
+        } catch (ScriptErrorException $error) {
+            exit('Aborting...');
+        }
     }
 }
