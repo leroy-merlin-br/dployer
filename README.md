@@ -4,20 +4,20 @@ A simple script to deploy PHP applications in a few minutes to ElasticBeanstalk.
 
 ---
 
-- Installation
-  - Composer
-- Global config for dployer
-  - AWS Config
-    - Environment Variables
-    - JSON configuration file
-  - AWS Bucket
-- Usage
-  - Options
-- Project Configuration
-  - Sample
-  - Events
-  - copy-paths
-  - exclude-paths
+- [Installation](#installation)
+  - [Composer](#composer)
+- [Global config for dployer](#global-config-for-dployer)
+  - [AWS Config](#aws-config)
+    - [Environment Variables](#environment-variables)
+    - [JSON configuration file](#json-configuration-file)
+  - [AWS Bucket](#aws-bucket)
+- [Usage](#usage)
+  - [Options](#options)
+- [Project Configuration](#project-configuration)
+  - [Sample](#sample-dployer)
+  - [Events](#events)
+  - [copy-paths](#copy-paths)
+  - [exclude-paths](#exclude-paths)
 
 ---
 
