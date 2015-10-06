@@ -10,7 +10,7 @@ $app->bind('php', function () {
 
 // Bind the Symfony Console application
 $app->bind('console', function () {
-    return new Symfony\Component\Console\Application('Dployment', '0.1 BETA');
+    return new Symfony\Component\Console\Application('dployer', '1.2.1');
 }, true);
 
 function app()
