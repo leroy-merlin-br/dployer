@@ -128,13 +128,15 @@ class ScriptRunner
             false
         );
 
-        $isForce      = ($this->stopOnError && false === $this->interactive);
-        $confirmAbort = ($this->interactive &&
-            false === $this->helper->ask($this->input, $output, $question)
-        );
+        if ($error) {
+            $stopOnError  = ($this->stopOnError && false === $this->interactive);
+            $confirmAbort = ($this->interactive &&
+                false === $this->helper->ask($this->input, $output, $question)
+            );
 
-        if ($error && ($isForce || $confirmAbort)) {
-            throw new ScriptErrorException();
+            if ($stopOnError || $confirmAbort) {
+                throw new ScriptErrorException();
+            }
         }
 
         return true;
