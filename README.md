@@ -119,8 +119,8 @@ dployer deploy
             "gulp build --production"
         ],
         "before-deploy": [
-            "echo 'Dploying new version'",
-            "echo 'Another import command to run before deploy'"
+            "echo 'Deploying new version'",
+            "echo 'Another important command to run before deploy'"
         ],
         "finish": [
             "gulp clean",
