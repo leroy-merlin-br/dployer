@@ -40,6 +40,8 @@ class ProjectPacker
      */
     public function pack(array $excludePaths = [], array $copyPaths = [])
     {
+        $this->removeTempFolder();
+
         // Clone the repo into a tmp folder
         $this->output->writeln("Clonning clean repository...");
         exec('git clone . ../.deployment > /dev/null');
@@ -64,7 +66,7 @@ class ProjectPacker
 
         // Remove tmp folder
         $this->output->writeln("Removing temporary files...");
-        exec('rm -rf ../.deployment');
+        $this->removeTempFolder();
 
         return $zipFilename;
     }
@@ -105,5 +107,15 @@ class ProjectPacker
                 exec(sprintf('cp -rf %1$s ../.deployment/%1$s', $path));
             }
         }
+    }
+
+    /**
+     * Removes temporary folder
+     *
+     * @return integer The 'exec' output
+     */
+    private function removeTempFolder()
+    {
+        return exec('rm -rf ../.deployment');
     }
 }
