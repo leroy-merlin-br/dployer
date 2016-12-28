@@ -1,4 +1,5 @@
 <?php
+
 namespace Dployer\Command;
 
 use Dployer\Config\BadFormattedFileException;
@@ -17,7 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Deploy extends Command
 {
     /**
-     * Application
+     * Application.
+     *
      * @var \Illuminate\Container\Container
      */
     protected $app;
@@ -33,7 +35,7 @@ class Deploy extends Command
     protected $scriptRunner;
 
     /**
-     * Set the app attribute using the global $app variable
+     * Set the app attribute using the global $app variable.
      */
     public function __construct()
     {
@@ -51,7 +53,7 @@ class Deploy extends Command
         $this->scriptRunner = new ScriptRunner();
 
         file_put_contents(
-            sys_get_temp_dir() . '/guzzle-cacert.pem',
+            sys_get_temp_dir().'/guzzle-cacert.pem',
             file_get_contents('vendor/guzzle/guzzle/src/Guzzle/Http/Resources/cacert.pem')
         );
     }
@@ -96,18 +98,18 @@ class Deploy extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @return null|int     null or 0 if everything went fine, or an error code
+     * @return null|int null or 0 if everything went fine, or an error code
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $app = $input->getArgument('application') ?: $this->getConfigValue('application');
         $env = $input->getArgument('environment') ?: $this->getConfigValue('environment');
 
-        if (! $app) {
+        if (!$app) {
             return $this->variableNotDefined('application', $output);
         }
 
-        if (! $env) {
+        if (!$env) {
             return $this->variableNotDefined('environment', $output);
         }
 
@@ -124,19 +126,19 @@ class Deploy extends Command
 
         $this->dispatchEvent('init', $output);
 
-        $branch    = exec('echo $(git branch | sed -n -e \'s/^\* \(.*\)/\1/p\')');
+        $branch = exec('echo $(git branch | sed -n -e \'s/^\* \(.*\)/\1/p\')');
         $commitMsg = exec('echo $(git log --format="%s" -n 1)');
 
-        $output->writeln("<info>APP:</info>".$app);
-        $output->writeln("<info>ENV:</info>".$env);
+        $output->writeln('<info>APP:</info>'.$app);
+        $output->writeln('<info>ENV:</info>'.$env);
 
         $this->dispatchEvent('before-pack', $output);
 
         $packer = $this->app->make(ProjectPacker::class);
         $packer->setOutput($output);
         $filename = $packer->pack(
-            (array)$this->getConfigValue('exclude-paths'),
-            (array)$this->getConfigValue('copy-paths')
+            (array) $this->getConfigValue('exclude-paths'),
+            (array) $this->getConfigValue('copy-paths')
         );
 
         $this->dispatchEvent('before-deploy', $output);
@@ -147,7 +149,7 @@ class Deploy extends Command
 
         if ($versionLabel && $ebsManager->deployVersion($versionLabel)) {
             $this->removeZipFile($filename, $output);
-            $output->writeln("<info>done</info>");
+            $output->writeln('<info>done</info>');
 
             $this->dispatchEvent('finish', $output);
 
@@ -156,34 +158,34 @@ class Deploy extends Command
 
         $this->dispatchEvent('finish', $output);
 
-        $output->writeln("<error>failed</error>");
+        $output->writeln('<error>failed</error>');
 
         return 1;
     }
 
     /**
-     * Removes the deployed .zip file
+     * Removes the deployed .zip file.
      *
-     * @param string $filename
-     * @param OutputInterface $output An OutputInterface instance
+     * @param string          $filename
+     * @param OutputInterface $output   An OutputInterface instance
      */
     protected function removeZipFile($filename, OutputInterface $output)
     {
         $output->writeln("Removing $filename...");
         if (false === unlink($filename)) {
-            $output->writeln("Unable to remove zip file. Run manually:");
+            $output->writeln('Unable to remove zip file. Run manually:');
             $output->writeln("rm $filename");
         } else {
-            $output->writeln("Removed");
+            $output->writeln('Removed');
         }
     }
 
     /**
-     * Retrieves value from config file
+     * Retrieves value from config file.
      *
      * @param string $key
      *
-     * @return array|integer|string|null
+     * @return array|int|string|null
      */
     protected function getConfigValue($key)
     {
@@ -191,19 +193,19 @@ class Deploy extends Command
     }
 
     /**
-     * Abort application due to missing required variable
+     * Abort application due to missing required variable.
      *
-     * @param string $var
+     * @param string          $var
      * @param OutputInterface $output
      *
      * @return int
      */
     protected function variableNotDefined($var, OutputInterface $output)
     {
-        $output->writeln(sprintf("<error>%s is not defined</error>", $var));
+        $output->writeln(sprintf('<error>%s is not defined</error>', $var));
         $output->writeln(sprintf(
             "Add '%s' key in the .dployer file or pass it as ".
-            "command parameter",
+            'command parameter',
             $var
         ));
 
@@ -212,9 +214,9 @@ class Deploy extends Command
 
     /**
      * Dispatch an event and execute the commands in 'script' key on config
-     * file
+     * file.
      *
-     * @param string $eventName
+     * @param string          $eventName
      * @param OutputInterface $output
      */
     protected function dispatchEvent($eventName, OutputInterface $output)
@@ -228,7 +230,7 @@ class Deploy extends Command
         $output->writeln('Event: '.$eventName);
 
         try {
-            $this->scriptRunner->run((array)$scripts, $output);
+            $this->scriptRunner->run((array) $scripts, $output);
         } catch (ScriptErrorException $error) {
             exit('Aborting...');
         }
