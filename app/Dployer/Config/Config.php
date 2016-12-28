@@ -16,7 +16,7 @@ class Config
     /**
      * Constructor
      *
-     * @param string Full path of configuration file
+     * @param string $filePath Full path of configuration file
      *
      * @throws InvalidArgumentException
      * @throws BadFormattedFileException

@@ -51,7 +51,10 @@ class ScriptRunner
     /**
      * Enables script interactivity.
      *
-     * @return self
+     * @param InputInterface $input
+     * @param QuestionHelper $helper
+     *
+     * @return ScriptRunner
      */
     public function enableInteractivity(
         InputInterface $input,
@@ -81,7 +84,7 @@ class ScriptRunner
     /**
      * Asks before run every single command
      *
-     * @param  array $script
+     * @param  array           $scripts
      * @param  OutputInterface $output
      */
     protected function runInteractively($scripts, OutputInterface $output)
@@ -106,15 +109,17 @@ class ScriptRunner
     /**
      * Executes a single command
      *
-     * @param  string $script
+     * @param  string          $script
      * @param  OutputInterface $output
+     *
+     * @return bool
      */
     protected function execute($script, OutputInterface $output)
     {
         $output->write(sprintf(' * %s: ', $script));
         exec($script, $response, $error);
         $output->writeln(
-            ($error)
+            $error
             ? '<error>Error!</error>'
             : '<info>Success!</info>'
         );

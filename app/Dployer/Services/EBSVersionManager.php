@@ -1,14 +1,11 @@
 <?php
 namespace Dployer\Services;
 
+use Aws\Common\Aws;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class EBSVersionManager
- *
  * Manages project versions in AWS ElasticBeanstalk.
- *
- * @package  Dployer\Services
  */
 class EBSVersionManager
 {
@@ -31,13 +28,13 @@ class EBSVersionManager
 
     /**
      * Base class for interacting with web service clients
-     * @var Aws\Common\Aws
+     * @var Aws
      */
     protected $aws;
 
     /**
      * All env vars required to deploy something.
-     * @var [type]
+     * @var array
      */
     protected static $envVarsRequired = [
         'DPLOYER_PROFILE',
@@ -53,11 +50,9 @@ class EBSVersionManager
     {
         $this->app = app();
 
-        $aws = $this->app->make('Aws\Common\Aws');
-
         $config = $this->buildConfig();
 
-        $this->aws = $aws->factory($config);
+        $this->aws = $this->app->make(Aws::class)->factory($config);
     }
 
     /**
@@ -82,13 +77,13 @@ class EBSVersionManager
      *
      * @return string VersionLabel
      */
-    public function createVersion($filename, $description = "")
+    public function createVersion($filename, $description = '')
     {
-        if (! getenv('DPLOYER_BUCKET')) {
+        if (! $bucketEnv = getenv('DPLOYER_BUCKET')) {
             $this->output->writeln("<error>DPLOYER_BUCKET environment variable not set</error>");
         }
 
-        $bucket       = getenv('DPLOYER_BUCKET') ?: 'dployer-versions';
+        $bucket       = $bucketEnv ?: 'dployer-versions';
         $key          = str_replace('.zip', '-'.date('U').'.zip', $filename);
         $versionLabel = $key;
 
@@ -134,21 +129,16 @@ class EBSVersionManager
         $ebs = $this->aws->get('ElasticBeanstalk');
 
         $this->output->writeln(
-            "Deploying version <info>$versionLabel</info> to <info>".
-            $this->app." ".$this->env."</info>..."
+            "Deploying version <info>{$versionLabel}</info> to <info>{$this->app} {$this->env}</info>..."
         );
 
         $env = $ebs->updateEnvironment([
-            "ApplicationName" => $this->app,
-            "EnvironmentName" => $this->env,
-            "VersionLabel" => $versionLabel,
+            'ApplicationName' => $this->app,
+            'EnvironmentName' => $this->env,
+            'VersionLabel' => $versionLabel,
         ]);
 
-        if ($env->get('VersionLabel') == $versionLabel) {
-            return true;
-        }
-
-        return false;
+        return $env->get('VersionLabel') == $versionLabel;
     }
 
     /**
@@ -160,15 +150,15 @@ class EBSVersionManager
     {
         if ($this->allEnvironmentVariablesOk()) {
             $defaultConfig = [
-                "region"  => getenv('DPLOYER_REGION'),
-                "key"     => getenv('DPLOYER_AWS_KEY'),
-                "secret"  => getenv('DPLOYER_AWS_SECRET')
+                'region'  => getenv('DPLOYER_REGION'),
+                'key'     => getenv('DPLOYER_AWS_KEY'),
+                'secret'  => getenv('DPLOYER_AWS_SECRET')
             ];
 
             return $defaultConfig;
         }
 
-        $fileConfig = getenv("HOME").'/.aws/config.json';
+        $fileConfig = getenv('HOME').'/.aws/config.json';
 
         return $fileConfig;
     }

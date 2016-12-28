@@ -12,7 +12,6 @@ class BadFormattedFileException extends Exception
      * Constructor
      *
      * @param string     $filePath
-     * @param \Exception $previous
      */
     public function __construct($filePath)
     {

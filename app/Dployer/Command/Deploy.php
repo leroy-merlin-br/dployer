@@ -5,6 +5,9 @@ use Dployer\Config\BadFormattedFileException;
 use Dployer\Config\Config;
 use Dployer\Event\ScriptRunner;
 use Dployer\Event\ScriptErrorException;
+use Dployer\Services\EBSVersionManager;
+use Dployer\Services\ProjectPacker;
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,7 +18,7 @@ class Deploy extends Command
 {
     /**
      * Application
-     * @var Illuminate\Container\Container
+     * @var \Illuminate\Container\Container
      */
     protected $app;
 
@@ -39,7 +42,7 @@ class Deploy extends Command
 
         try {
             $this->config = new Config(getcwd().'/.dployer');
-        } catch (\InvalidArgumentException $error) {
+        } catch (InvalidArgumentException $error) {
             $this->config = null;
         } catch (BadFormattedFileException $error) {
             die($error->getMessage());
@@ -97,10 +100,8 @@ class Deploy extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $app = $input->getArgument('application')
-            ?: $this->getConfigValue('application');
-        $env = $input->getArgument('environment')
-            ?: $this->getConfigValue('environment');
+        $app = $input->getArgument('application') ?: $this->getConfigValue('application');
+        $env = $input->getArgument('environment') ?: $this->getConfigValue('environment');
 
         if (! $app) {
             return $this->variableNotDefined('application', $output);
@@ -131,7 +132,7 @@ class Deploy extends Command
 
         $this->dispatchEvent('before-pack', $output);
 
-        $packer = $this->app->make('Dployer\Services\ProjectPacker');
+        $packer = $this->app->make(ProjectPacker::class);
         $packer->setOutput($output);
         $filename = $packer->pack(
             (array)$this->getConfigValue('exclude-paths'),
@@ -140,7 +141,7 @@ class Deploy extends Command
 
         $this->dispatchEvent('before-deploy', $output);
 
-        $ebsManager = $this->app->make('Dployer\Services\EBSVersionManager');
+        $ebsManager = $this->app->make(EBSVersionManager::class);
         $ebsManager->init($app, $env, $output);
         $versionLabel = $ebsManager->createVersion($filename, "[$branch] $commitMsg");
 
@@ -186,11 +187,7 @@ class Deploy extends Command
      */
     protected function getConfigValue($key)
     {
-        if (! $this->config) {
-            return null;
-        }
-
-        return $this->config->get($key);
+        return $this->config ? $this->config->get($key) : null;
     }
 
     /**
@@ -199,7 +196,7 @@ class Deploy extends Command
      * @param string $var
      * @param OutputInterface $output
      *
-     * @return 0
+     * @return int
      */
     protected function variableNotDefined($var, OutputInterface $output)
     {
