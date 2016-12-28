@@ -1,50 +1,49 @@
 <?php
+
 namespace Dployer\Config;
 
-/**
-* Test case for Dployer\Config class
-*/
-class ConfigTest extends \PHPUnit_Framework_TestCase
+use InvalidArgumentException;
+use PHPUnit_Framework_TestCase;
+
+class ConfigTest extends PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInvalidConfigPathShouldThrowsException()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         new Config($this->getFixture('non-existent'));
     }
 
-    public function testConstructorShouldReadFileAndFillDataAttibute()
+    public function testConstructorShouldReadFileAndFillDataAttribute()
     {
         $config = new Config($this->getFixture('well-formatted.json'));
         $this->assertAttributeEquals(
             [
                 'app' => 'app-value',
                 'env' => 'env-value',
-                "second" => [
-                    "level" => "second-value",
+                'second' => [
+                    'level' => 'second-value',
                 ],
-                "third" => [
-                    "level" => [
-                        "key" => "third-value",
-                        "array" => [
-                            "third-value-array-1",
-                            "third-value-array-2",
-                            "third-value-array-3",
-                        ]
-                    ]
-                ]
+                'third' => [
+                    'level' => [
+                        'key' => 'third-value',
+                        'array' => [
+                            'third-value-array-1',
+                            'third-value-array-2',
+                            'third-value-array-3',
+                        ],
+                    ],
+                ],
             ],
             'data',
             $config
         );
     }
 
-    /**
-     * @expectedException Dployer\Config\BadFormattedFileException
-     */
     public function testParseDataOfBadFormattedFileShouldThrowsException()
     {
+        $this->expectException(BadFormattedFileException::class);
+
         new Config($this->getFixture('bad-formatted.json'));
     }
 
@@ -89,9 +88,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Retrieves fill path of fixture
+     * Retrieves fill path of fixture.
      *
-     * @param  string $fileName
+     * @param string $fileName
      *
      * @return string
      */

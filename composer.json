@@ -9,10 +9,13 @@
         "ebs"
     ],
     "require": {
-        "aws/aws-sdk-php": "~2.6.5",
-        "icecave/isolator": "~2.2.1",
-        "illuminate/container": "~4.2.0-BETA1",
-        "symfony/console": "~2.5",
+        "php": ">=7.0",
+        "aws/aws-sdk-php": "~2.8",
+        "icecave/isolator": "~2.3",
+        "illuminate/container": "~4.2",
+        "symfony/console": "~2.8"
+    },
+    "require-dev": {
         "phpunit/phpunit": "~5"
     },
     "autoload": {
@@ -25,7 +28,7 @@
     ],
     "extra": {
         "branch-alias": {
-            "dev-master": "1.2.x-dev"
+            "dev-master": "1.3.x-dev"
         }
     },
     "minimum-stability": "dev",

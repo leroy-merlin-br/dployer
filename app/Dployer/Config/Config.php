@@ -1,11 +1,12 @@
 <?php
+
 namespace Dployer\Config;
 
 use InvalidArgumentException;
 
 /**
-* Class to get configuration values from a given file
-*/
+ * Class to get configuration values from a given file.
+ */
 class Config
 {
     /**
@@ -14,9 +15,9 @@ class Config
     protected $data = [];
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param string Full path of configuration file
+     * @param string $filePath Full path of configuration file
      *
      * @throws InvalidArgumentException
      * @throws BadFormattedFileException
@@ -35,9 +36,9 @@ class Config
     /**
      * Retrieves the value of corresponding key.
      *
-     * @param  string $path
+     * @param string $path
      *
-     * @return string|integer|array|null
+     * @return string|int|array|null
      */
     public function get($path)
     {
@@ -46,7 +47,7 @@ class Config
 
         do {
             if (false === array_key_exists($path, $value)) {
-                return null;
+                return;
             }
 
             $value = $value[$path];
@@ -56,9 +57,9 @@ class Config
     }
 
     /**
-     * Gets file content and parse it into $data array
+     * Gets file content and parse it into $data array.
      *
-     * @param  string $filePath
+     * @param string $filePath
      *
      * @throws BadFormattedFileException
      */

@@ -1,16 +1,14 @@
 <?php
+
 namespace Dployer\Config;
 
-use LogicException;
+use PHPUnit_Framework_TestCase;
 
-/**
-* Test case for Dployer\Config\BadFormattedFileException
-*/
-class BadFormattedFileExceptionTest extends \PHPUnit_Framework_TestCase
+class BadFormattedFileExceptionTest extends PHPUnit_Framework_TestCase
 {
     public function testConstructorShouldCallParentWithCustomMessage()
     {
-        $filePath  = 'some';
+        $filePath = 'some';
         $exception = new BadFormattedFileException($filePath);
 
         $this->assertEquals(
