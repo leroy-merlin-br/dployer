@@ -56,7 +56,7 @@ class ProjectPacker
         }
 
         $this->output->writeln('Creating zip file...');
-        exec('zip -r '.$zipFilename.' * > /dev/null');
+        exec('zip -r '.$zipFilename.' . > /dev/null');
         exec('mv '.$zipFilename.' "'.$currentDir.'/'.$zipFilename.'"');
         chdir($currentDir);
 
