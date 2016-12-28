@@ -16,5 +16,6 @@ $app->bind('console', function () {
 function app()
 {
     global $app;
+
     return $app;
 }

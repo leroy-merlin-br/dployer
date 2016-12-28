@@ -1,4 +1,5 @@
 <?php
+
 namespace Dployer\Services;
 
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,7 +17,7 @@ class ProjectPacker
     protected $output;
 
     /**
-     * Sets the output interface
+     * Sets the output interface.
      *
      * @param OutputInterface|null $output
      */
@@ -30,7 +31,7 @@ class ProjectPacker
      * or null if the file was not generated.
      *
      * @param array $excludePaths Paths to exclude before pack zip file
-     * @param array $copyPaths Paths to copy from project before create zip file
+     * @param array $copyPaths    Paths to copy from project before create zip file
      *
      * @return string Filename
      */
@@ -47,7 +48,7 @@ class ProjectPacker
         }
 
         // Create the zip the file
-        $currentDir  = getcwd();
+        $currentDir = getcwd();
         $zipFilename = exec('echo ver_$(git log --format="%H" -n 1).zip');
         chdir('../.deployment');
 
@@ -68,9 +69,9 @@ class ProjectPacker
     }
 
     /**
-     * Remove the given paths
+     * Remove the given paths.
      *
-     * @param  array  $paths
+     * @param array $paths
      */
     public function removePaths(array $paths)
     {
@@ -85,9 +86,9 @@ class ProjectPacker
     }
 
     /**
-     * Copy the given paths to .deployment folder
+     * Copy the given paths to .deployment folder.
      *
-     * @param  array  $paths
+     * @param array $paths
      */
     public function copyPaths(array $paths)
     {
@@ -106,9 +107,9 @@ class ProjectPacker
     }
 
     /**
-     * Removes temporary folder
+     * Removes temporary folder.
      *
-     * @return integer The 'exec' output
+     * @return int The 'exec' output
      */
     private function removeTempFolder()
     {

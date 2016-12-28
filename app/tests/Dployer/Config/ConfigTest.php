@@ -1,4 +1,5 @@
 <?php
+
 namespace Dployer\Config;
 
 use InvalidArgumentException;
@@ -9,7 +10,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
     public function testInvalidConfigPathShouldThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
-        
+
         new Config($this->getFixture('non-existent'));
     }
 
@@ -30,9 +31,9 @@ class ConfigTest extends PHPUnit_Framework_TestCase
                             'third-value-array-1',
                             'third-value-array-2',
                             'third-value-array-3',
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
             'data',
             $config
@@ -87,9 +88,9 @@ class ConfigTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Retrieves fill path of fixture
+     * Retrieves fill path of fixture.
      *
-     * @param  string $fileName
+     * @param string $fileName
      *
      * @return string
      */

@@ -1,4 +1,5 @@
 <?php
+
 namespace Dployer\Event;
 
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -7,12 +8,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
-* Class to execute scripts that are configured in .dployer file
-*/
+ * Class to execute scripts that are configured in .dployer file.
+ */
 class ScriptRunner
 {
     /**
-     * @var integer
+     * @var int
      */
     protected $interactive = false;
 
@@ -27,14 +28,14 @@ class ScriptRunner
     protected $helper;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $stopOnError = true;
 
     /**
-     * Run script set
+     * Run script set.
      *
-     * @param array $scripts
+     * @param array           $scripts
      * @param OutputInterface $output
      */
     public function run($scripts, OutputInterface $output)
@@ -63,14 +64,14 @@ class ScriptRunner
         $input->setInteractive(true);
 
         $this->interactive = true;
-        $this->input  = $input;
+        $this->input = $input;
         $this->helper = $helper;
 
         return $this;
     }
 
     /**
-     * Continue running scripts even if it returns with errors
+     * Continue running scripts even if it returns with errors.
      *
      * @return self
      */
@@ -82,10 +83,10 @@ class ScriptRunner
     }
 
     /**
-     * Asks before run every single command
+     * Asks before run every single command.
      *
-     * @param  array           $scripts
-     * @param  OutputInterface $output
+     * @param array           $scripts
+     * @param OutputInterface $output
      */
     protected function runInteractively($scripts, OutputInterface $output)
     {
@@ -107,10 +108,10 @@ class ScriptRunner
     }
 
     /**
-     * Executes a single command
+     * Executes a single command.
      *
-     * @param  string          $script
-     * @param  OutputInterface $output
+     * @param string          $script
+     * @param OutputInterface $output
      *
      * @return bool
      */
@@ -134,7 +135,7 @@ class ScriptRunner
         );
 
         if ($error) {
-            $stopOnError  = ($this->stopOnError && false === $this->interactive);
+            $stopOnError = ($this->stopOnError && false === $this->interactive);
             $confirmAbort = ($this->interactive &&
                 false === $this->helper->ask($this->input, $output, $question)
             );
@@ -148,10 +149,10 @@ class ScriptRunner
     }
 
     /**
-     * Write all lines of script response
+     * Write all lines of script response.
      *
-     * @param  array           $response
-     * @param  OutputInterface $output
+     * @param array           $response
+     * @param OutputInterface $output
      */
     private function writeResponse(array $response, OutputInterface $output)
     {
