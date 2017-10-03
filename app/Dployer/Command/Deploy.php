@@ -129,6 +129,8 @@ class Deploy extends Command
         $branch = exec('echo $(git branch | sed -n -e \'s/^\* \(.*\)/\1/p\')');
         $commitMsg = exec('echo $(git log --format="%s" -n 1)');
 
+        $this->exportDeployInfoToEnv($app, $env, $branch, $commit);
+
         $output->writeln('<info>APP:</info>'.$app);
         $output->writeln('<info>ENV:</info>'.$env);
 
@@ -234,5 +236,23 @@ class Deploy extends Command
         } catch (ScriptErrorException $error) {
             exit('Aborting...');
         }
+    }
+
+    /**
+     * Export deploy configuration to env vars so they can be accessed
+     * inside .dployer file.
+     *
+     * @param string $app    EBS Aplication name.
+     * @param string $env    EBS Environment name.
+     * @param string $branch Current git branch.
+     * @param string $commit Current git message.
+     *
+     */
+    protected function exportDeployInfoToEnv($app, $env, $branch, $commit)
+    {
+        exec('export EBS_APP="'.$app.'"');
+        exec('export EBS_ENV="'.$env.'"');
+        exec('export GIT_BRANCH="'.$branch.'"');
+        exec('export GIT_COMMIT="'.$commit.'"');
     }
 }

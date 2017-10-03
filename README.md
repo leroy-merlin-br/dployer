@@ -26,7 +26,7 @@ A simple script to deploy PHP applications in a few minutes to ElasticBeanstalk.
 ### Composer
 
 ```shell
-composer global require "leroy-merlin-br/dployer=*@dev"
+composer global require leroy-merlin-br/dployer"
 ```
 
 ## Global config for dployer
@@ -137,6 +137,51 @@ dployer deploy
     ]
 }
 ```
+
+### Runtime variables
+
+During deploy process, you may need to reuse some of the runtime parameters in your `.dployer` file. This parameters are exposed via environment variables so they can be accessed by your `.dployer` file steps.
+
+```
+EBS_APP = EBS Aplication name.
+EBS_ENV = EBS Environment name.
+GIT_BRANCH = Current git branch.
+GIT_COMMIT = Current git message.
+```
+
+In your `.dployer` you can trigger a notification scrpit with this env vars content:
+
+```json
+{
+    "application": "ApplicationName",
+    "environment": "my-environment",
+    "scripts": {
+        "init": "composer dumpautoload",
+        "before-pack": [
+            "gulp build --production"
+        ],
+        "before-deploy": [
+            "echo 'Deploying new version'",
+            "sh ./slack.sh start $EBS_APP $EBS_ENV",
+            "echo 'Another important command to run before deploy'"
+        ],
+        "finish": [
+            "gulp clean",
+            "sh ./slack.sh finish $EBS_APP $EBS_ENV",
+            "echo 'Nicely done'"
+        ]
+    },
+    "copy-paths": [
+        "vendor",
+        "public/assets"
+    ],
+    "exclude-paths": [
+        ".git",
+        "vendor/**/*.git"
+    ]
+}
+```
+
 ### Events
 
 Dployer triggers 4 events in deploy flow:
