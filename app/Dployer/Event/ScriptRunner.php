@@ -100,6 +100,7 @@ class ScriptRunner
 
             if (false === $this->helper->ask($this->input, $output, $question)) {
                 $output->writeln('Skipped!');
+
                 continue;
             }
 

@@ -242,11 +242,10 @@ class Deploy extends Command
      * Export deploy configuration to env vars so they can be accessed
      * inside .dployer file.
      *
-     * @param string $app    EBS Aplication name.
-     * @param string $env    EBS Environment name.
-     * @param string $branch Current git branch.
-     * @param string $commit Current git message.
-     *
+     * @param string $app    EBS Aplication name
+     * @param string $env    EBS Environment name
+     * @param string $branch current git branch
+     * @param string $commit current git message
      */
     protected function exportDeployInfoToEnv($app, $env, $branch, $commit)
     {
