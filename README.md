@@ -15,6 +15,7 @@ A simple script to deploy PHP applications in a few minutes to ElasticBeanstalk.
   - [Options](#options)
 - [Project Configuration](#project-configuration)
   - [Sample](#sample-dployer)
+  - [Runtime variables](#runtime-variables)
   - [Events](#events)
   - [copy-paths](#copy-paths)
   - [exclude-paths](#exclude-paths)
@@ -26,7 +27,7 @@ A simple script to deploy PHP applications in a few minutes to ElasticBeanstalk.
 ### Composer
 
 ```shell
-composer global require "leroy-merlin-br/dployer=*@dev"
+composer global require leroy-merlin-br/dployer
 ```
 
 ## Global config for dployer
@@ -43,7 +44,7 @@ You have 2 options to configure AWS:
 You must fill the following environment variables.
 
 - `DPLOYER_PROFILE` : Your profile's name in AWS.
-- `DPLOYER_REGION`  : Your region you want to deploy something.
+- `DPLOYER_REGION` : Your region you want to deploy something.
 - `DPLOYER_AWS_KEY` : Your secret AWS key.
 - `DPLOYER_AWS_SECRET` : Your secret AWS SECRET.
 
@@ -137,6 +138,39 @@ dployer deploy
     ]
 }
 ```
+
+### Runtime variables
+
+During deploy process, you may need to reuse some of the runtime parameters in your `.dployer` file. This parameters are exposed via environment variables so they can be accessed by your `.dployer` file steps.
+
+
+ - `EBS_APP` : EBS Aplication name.
+ - `EBS_ENV` : EBS Environment name.
+ - `GIT_BRANCH` : Current git branch.
+ - `GIT_COMMIT` : Current git message.
+
+
+In your `.dployer` you can trigger a notification scrpit with this env vars content:
+
+```json
+(...)
+"scripts": {
+    "init": "composer dumpautoload",
+    "before-pack": [
+        "gulp build --production"
+    ],
+    "before-deploy": [
+        "echo 'Deploying new version'",
+        "sh ./slack.sh start $EBS_APP $EBS_ENV",
+    ],
+    "finish": [
+        "sh ./slack.sh finish $EBS_APP $EBS_ENV",
+        "echo 'Nicely done'"
+    ]
+}
+(...)
+```
+
 ### Events
 
 Dployer triggers 4 events in deploy flow:
