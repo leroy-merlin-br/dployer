@@ -42,14 +42,6 @@ class Deploy extends Command
         parent::__construct();
         $this->app = app();
 
-        try {
-            $this->config = new Config(getcwd().'/.dployer');
-        } catch (InvalidArgumentException $error) {
-            $this->config = null;
-        } catch (BadFormattedFileException $error) {
-            die($error->getMessage());
-        }
-
         $this->scriptRunner = new ScriptRunner();
 
         file_put_contents(
@@ -78,6 +70,12 @@ class Deploy extends Command
                 'Environment name within the Application'
             )
             ->addOption(
+                'config',
+                'c',
+                InputOption::VALUE_NONE,
+                'Use a custom .dployer file to run'
+            )
+            ->addOption(
                 'interactive',
                 'i',
                 InputOption::VALUE_NONE,
@@ -102,6 +100,16 @@ class Deploy extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $config = $input->getArgument('environment') ?: '.dployer';
+
+        try {
+            $this->config = new Config(getcwd().'/'.$config);
+        } catch (InvalidArgumentException $error) {
+            $this->config = null;
+        } catch (BadFormattedFileException $error) {
+            die($error->getMessage());
+        }
+
         $app = $input->getArgument('application') ?: $this->getConfigValue('application');
         $env = $input->getArgument('environment') ?: $this->getConfigValue('environment');
 
