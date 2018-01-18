@@ -87,6 +87,7 @@ dployer deploy ApplicationName elasticbeanstalked-environment
 
 You can use the following options:
 
+- **-c (--config)**: Use a custom configuration file different from .deployer
 - **-i (--interactive)**: Asks before run each command in configuration file
 - **-v (--verbose)**: Display command outputs
 - **-f (--force)**: Continue with deploy process even if a script exits with error
