@@ -72,8 +72,9 @@ class Deploy extends Command
             ->addOption(
                 'config',
                 'c',
-                InputOption::VALUE_NONE,
-                'Use a custom .dployer file to run'
+                InputOption::VALUE_REQUIRED,
+                'Use a custom .dployer file to run',
+                '.dployer'
             )
             ->addOption(
                 'interactive',
@@ -100,7 +101,7 @@ class Deploy extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $config = $input->getArgument('environment') ?: '.dployer';
+        $config = $input->getOption('config');
 
         try {
             $this->config = new Config(getcwd().'/'.$config);
